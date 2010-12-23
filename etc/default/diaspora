@@ -1,0 +1,32 @@
+export RAILS_ENV=production
+export DIASPORA_HOME=/usr/local/app/diaspora
+export THIN_USER=nobody
+export THIN_GROUP=nogroup
+
+function wait_service() {
+	if [ $# -le 0 ]; then echo "missing service" 1>&2; return 1; fi
+	for service in $*; do 
+		case $service in
+		mongo)
+			args="localhost 27017"
+		;;
+		redis)
+			args="localhost 6379"
+		;;
+		smtp)
+			args="localhost 25"
+		;;
+		web)
+			args="localhost 80"
+		;;
+		websocket)
+			args="localhost 8080"
+		;;
+		*)
+			echo "unknown '$service'" 1>&2
+			return 2
+		;;
+		esac
+		while ! nc -z $args; do echo ${PWD##*/} waiting for $service; sleep 1; done
+	done
+}

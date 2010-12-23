@@ -1,0 +1,4 @@
+#!/bin/bash
+[ -r /etc/default/diaspora ] && . /etc/default/diaspora
+wait_service websocket
+cd $DIASPORA_HOME && QUEUE=* HOME=/root exec /usr/local/bin/bundle exec rake resque:work
