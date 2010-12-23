@@ -30,3 +30,24 @@ function wait_service() {
 		while ! nc -z $args; do echo ${PWD##*/} waiting for $service; sleep 1; done
 	done
 }
+
+function exec_thin() {
+	INSTANCE=${1:?missing instance}
+
+	cd $DIASPORA_HOME || return 1
+
+	LOG=log/thin.$INSTANCE.log
+	SOCK=/tmp/thin.$INSTANCE.sock
+
+	touch $LOG || return 2
+	chown $THIN_USER:$THIN_GROUP $LOG || return 3
+	chmod 640 $LOG || return 4
+
+	exec /usr/local/bin/bundle exec thin \
+		-l $LOG \
+		-S $SOCK \
+		-u ${THIN_USER:-nobody} \
+		-g ${THIN_GROUP:-nogroup} \
+		-e ${RAILS_ENV:-development} \
+		start 
+}

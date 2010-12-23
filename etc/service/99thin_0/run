@@ -3,27 +3,4 @@
 wait_service mongo web redis websocket
 # Expects to be in a directory that ends with _[0-9], ie thin_0...
 INSTANCE=`pwd|sed 's/.*_\([0-9]*\)/\1/'`
-LOG=log/thin.$INSTANCE.log
-SOCK=/tmp/thin.$INSTANCE.sock
-
-function thin_env()  {
-	instance=${1:?Missing instance}
-
-	cd $DIASPORA_HOME || return 1
-
-	touch $LOG || return 2
-	chown $THIN_USER:$THIN_GROUP $LOG || return 3
-	chmod 640 $LOG || return 4
-
-	return 0
-}
-
-# defined LOG and SOCK for instance n
-thin_env $INSTANCE || exit $?
-exec /usr/local/bin/bundle exec thin \
-	-l $LOG \
-	-S $SOCK \
-	-u ${THIN_USER:-nobody} \
-	-g ${THIN_GROUP:-nogroup} \
-	-e ${RAILS_ENV:-development} \
-	start 
+exec_thin $INSTANCE
