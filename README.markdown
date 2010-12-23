@@ -32,15 +32,15 @@ report these services as up.
 ## Installation
 
 1. Get your packages
-    * `sudo apt-get install postfix nginx redis-server mongo daemontools daemontools-run`
+    * `apt-get install postfix nginx redis-server mongo daemontools daemontools-run`
 1. Stop init from starting your Diaspora\* services
-    * `sudo update-rc.d -f mongodb remove`
-    * `sudo update-rc.d -f nginx remove`
-    * `sudo update-rc.d -f redis-server remove`
+    * `update-rc.d -f mongodb remove`
+    * `update-rc.d -f nginx remove`
+    * `update-rc.d -f redis-server remove`
 1. Stop services
-    * `sudo service mongodb stop`
-    * `sudo service nginx stop`
-    * `sudo service redis-server stop`
+    * `service mongodb stop`
+    * `service nginx stop`
+    * `service redis-server stop`
 1. Copy the etc skeleton into place
 `cd [GIT_SRC_TREE]`
     * `find . -name .git -prune -o -print | cpio -dpm /`
