@@ -45,7 +45,7 @@ errant services as well.
     * `service redis-server stop`
 1. Copy the etc skeleton into place
 `cd [GIT_SRC_TREE]`
-    * `find . -name .git -prune -o -print | cpio -dpm /`
+    * `find etc usr | cpio -dpm /`
     * `chmod a+x /etc/service/*/run /usr/local/bin/diaspora_svc.sh`
 1. Edit the defaults if you need to
     * `$EDITOR /etc/default/diaspora`
