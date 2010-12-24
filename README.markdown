@@ -10,13 +10,11 @@ The websocket run script will wait for redis availability. The resque worker
 will wait for websocket, and thin will wait for mongo, nginx, redis, and
 websocket availability.
 
-## Caveats 
-
-Websocket, resque worker, and thin processes will all block forever, until
-their required port(s) become available. As they attempt to connect to their
-dependent service, once a second, they will print this fact to STDOUT.  This
-allows you to check readproctitle for recurring errors, because svstat will
-report these services as up.
+If a script fails to connect to a dependent service 10 times, the run script
+will exit and try again. This allows you to monitor `svstat` for short lived
+processes. Each time the run script attempts to connect to a dependent service,
+it will be echoed to STDOUT. This will allow you to monitor readproctitle for
+errant services as well.
 
 ## Requirements
 
@@ -52,6 +50,23 @@ report these services as up.
     * `$EDITOR /etc/service/99thin_0/run`
 1. Start the daemontools service scanner (should run automatically, during next boot)
     * `initctl start svscan`
+
+## Customization
+
+1. Adding new thin processes
+    * `mkdir /etc/service/99thin_N`
+    * `cp /etc/service/99thin_0/run /etc/service/99thin_N`
+1. Set thin user and group in /etc/default/diaspora
+    * `THIN_USER=nobody`
+    * `THIN_GROUP=nogroup`
+1. Set rails environment in /etc/default/diaspora
+    * `RAILS_ENV=development`
+1. Set diaspora root directory in /etc/default/diaspora
+    * `DIASPORA_HOME=/usr/local/app/diaspora`
+1. Globally define the max attempts scripts will try to connect to services
+    * `DEFAULT_ATTEMPTS=10`
+1. Modify a single service's max attempts it will try to connect to a service
+    * in a run script: `wait_service -a N`
 
 ## diaspora_svc.sh usage
 

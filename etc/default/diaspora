@@ -1,9 +1,31 @@
-export RAILS_ENV=production
-export DIASPORA_HOME=/usr/local/app/diaspora
-export THIN_USER=nobody
-export THIN_GROUP=nogroup
+export RAILS_ENV=development
+DIASPORA_HOME=/usr/local/app/diaspora
+THIN_USER=nobody
+THIN_GROUP=nogroup
+# While waiting for dependent services, don't try more than
+# this many times. If the attempts exceeds this number, the
+# current run process will exit and it will try again. This
+# allows you to better monitor svstat output.
+DEFAULT_ATTEMPTS=10
 
+# Wait for service(s), making no more than N attempts to
+# connect. If attempts is 0, infinitely loop.
 function wait_service() {
+	attempts=$DEFAULT_ATTEMPTS
+	try=0
+	while getopts a: arg; do
+		case $arg in
+		a)
+			attempts="$OPTARG"
+			;;
+		*)
+			echo "Unknown argument '$arg'"
+			exit 1
+			;;
+		esac
+	done
+	[ $OPTIND -gt 1 ] && shift $((OPTIND-1))
+
 	if [ $# -le 0 ]; then echo "missing service" 1>&2; return 1; fi
 	for service in $*; do 
 		case $service in
@@ -27,25 +49,31 @@ function wait_service() {
 			return 2
 		;;
 		esac
-		while ! nc -z $args; do echo ${PWD##*/} waiting for $service; sleep 1; done
+		while ! nc -z $args; do
+			try=$((try+1))
+			# allows the process to die, svstat ticker resets
+			[ $attempts -gt 0 -a $try -gt $attempts ] && exit 126
+			echo ${PWD##*/} waiting for $service
+			sleep 1
+		done
 	done
 }
 
 function exec_thin() {
-	INSTANCE=${1:?missing instance}
+	instance=${1:?missing instance}
 
 	cd $DIASPORA_HOME || return 1
 
-	LOG=log/thin.$INSTANCE.log
-	SOCK=/tmp/thin.$INSTANCE.sock
+	log=log/thin.$instance.log
+	sock=/tmp/thin.$instance.sock
 
-	touch $LOG || return 2
-	chown $THIN_USER:$THIN_GROUP $LOG || return 3
-	chmod 640 $LOG || return 4
+	touch $log || return 2
+	chown $THIN_USER:$THIN_GROUP $log || return 3
+	chmod 640 $log || return 4
 
 	exec /usr/local/bin/bundle exec thin \
-		-l $LOG \
-		-S $SOCK \
+		-l $log \
+		-S $sock \
 		-u ${THIN_USER:-nobody} \
 		-g ${THIN_GROUP:-nogroup} \
 		-e ${RAILS_ENV:-development} \
