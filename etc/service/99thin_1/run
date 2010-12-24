@@ -1,6 +1,4 @@
 #!/bin/bash
 [ -r /etc/default/diaspora ] && . /etc/default/diaspora
-wait_service mongo web redis websocket
 # Expects to be in a directory that ends with _[0-9], ie thin_0...
-INSTANCE=`pwd|sed 's/.*_\([0-9]*\)/\1/'`
-exec_thin $INSTANCE
+exec_thin 

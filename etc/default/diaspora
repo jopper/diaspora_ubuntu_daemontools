@@ -60,7 +60,7 @@ function wait_service() {
 }
 
 function exec_thin() {
-	instance=${1:?missing instance}
+	instance=`pwd | sed 's/.*_\([0-9]*\)/\1/'`
 
 	cd $DIASPORA_HOME || return 1
 
@@ -70,6 +70,8 @@ function exec_thin() {
 	touch $log || return 2
 	chown $THIN_USER:$THIN_GROUP $log || return 3
 	chmod 640 $log || return 4
+
+	wait_service mongo web redis websocket
 
 	exec /usr/local/bin/bundle exec thin \
 		-l $log \
