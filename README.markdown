@@ -1,8 +1,12 @@
-# Daemontools for Diaspora\*, on Ubuntu
+[durl]:http://joindiaspora.com/ "Diaspora"
+[daurl]:http://cr.yp.to/daemontools.html "Daemontools"
+[dturl]:http://packages.ubuntu.com/da/maverick/daemontools
+[drurl]:http://packages.ubuntu.com/da/maverick/daemontools-run
+# [Daemontools][daurl] for [Diaspora\*][durl], on Ubuntu
 
 ## Rationale
 
-It seems that Diaspora\* is very picky about which services start first. This 
+It seems that [Diaspora\*][durl] is very picky about which services start first. This 
 is my attempt to decouple from the monolithic ./script/server, which provides
 no recourse for services which disappear. As best I can tell, the order of
 services should be (mongo, nginx, redis), websocket, resque worker, and thin.
@@ -19,19 +23,19 @@ errant services as well.
 ## Requirements
 
 + Ubuntu 10.10 (the only version I tested with)
-+ Diaspora requirements
++ [Diaspora\*][durl] requirements
     + As of this writing, it includes
         + MTA (we run postfix)
         + Web server (we run nginx)
         + Redis
         + MongoDB
-        + Debian packages: daemontools, daemontools-run
+        + Debian packages: [daemontools][dturl], [daemontools-run][drurl]
 
 ## Installation
 
 1. Get your packages
     * `apt-get install postfix nginx redis-server mongo daemontools daemontools-run`
-1. Stop init from starting your Diaspora\* services
+1. Stop init from starting your [Diaspora\*][durl] services
     * `update-rc.d -f mongodb remove`
     * `update-rc.d -f nginx remove`
     * `update-rc.d -f redis-server remove`
